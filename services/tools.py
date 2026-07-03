@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 _ORDERS_PATH = os.path.join("data", "orders.json")
 _PRODUCTS_PATH = os.path.join("data", "products.json")
@@ -69,5 +70,25 @@ def get_product(product_id: str) -> dict | None:
     for product in products:
         if isinstance(product, dict) and product.get("product_id") == product_id:
             return product
+
+    return None
+
+
+def route_tool(question: str) -> dict | None:
+    """Detect entity IDs in a question and route to the appropriate lookup tool.
+
+    Args:
+        question: The user's question string.
+
+    Returns:
+        The matched order or product dictionary, or None if no ID is found.
+    """
+    order_match = re.search(r"ORD-\d+", question)
+    if order_match:
+        return get_order(order_match.group())
+
+    product_match = re.search(r"PRD-\d+", question)
+    if product_match:
+        return get_product(product_match.group())
 
     return None
