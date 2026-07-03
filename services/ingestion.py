@@ -1,7 +1,7 @@
 from io import BytesIO
 
 from fastapi import UploadFile
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfReadError
 
 
 ALLOWED_EXTENSIONS = {".pdf", ".txt", ".md"}
@@ -29,11 +29,18 @@ def read_document(file: UploadFile) -> str:
     ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
     ext = f".{ext}"
 
-    if ext == ".pdf":
-        pdf_reader = PdfReader(BytesIO(file.file.read()))
-        text = "\n".join(page.extract_text() or "" for page in pdf_reader.pages)
-    else:
-        text = file.file.read().decode("utf-8")
+    try:
+        if ext == ".pdf":
+            pdf_reader = PdfReader(BytesIO(file.file.read()))
+            text = "\n".join(page.extract_text() or "" for page in pdf_reader.pages)
+        else:
+            text = file.file.read().decode("utf-8")
+    except PdfReadError:
+        raise ValueError("Invalid or corrupted PDF file")
+    except UnicodeDecodeError:
+        raise ValueError("File is not valid UTF-8 text")
+    except Exception:
+        raise ValueError("Failed to read the document")
 
     if not text.strip():
         raise ValueError("No readable text found in the document")

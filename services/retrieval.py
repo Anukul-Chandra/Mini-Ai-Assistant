@@ -1,4 +1,8 @@
+import logging
+
 from services.vector_store import load_vector_store
+
+logger = logging.getLogger(__name__)
 
 
 def retrieve_context(query: str, k: int = 3) -> list[str]:
@@ -12,12 +16,16 @@ def retrieve_context(query: str, k: int = 3) -> list[str]:
         A list of page content strings from the retrieved documents.
 
     Raises:
-        ValueError: If no vector store exists.
+        ValueError: If no vector store exists or the search fails.
     """
     vector_store = load_vector_store()
     if vector_store is None:
         raise ValueError("No vector store found. Please upload a document first.")
 
-    results = vector_store.similarity_search(query, k=k)
+    try:
+        results = vector_store.similarity_search(query, k=k)
+    except Exception as e:
+        logger.exception("Vector store search failed")
+        raise ValueError(f"Failed to search the vector store: {e}")
 
     return [doc.page_content for doc in results]

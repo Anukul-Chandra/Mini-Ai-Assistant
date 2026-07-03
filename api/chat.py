@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -6,6 +8,8 @@ from services.memory import add_to_memory, get_history
 from services.prompt_builder import build_prompt
 from services.retrieval import retrieve_context
 from services.tools import route_tool
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/chat")
 
@@ -29,7 +33,12 @@ def _build_history() -> str:
 
 @router.post("/ask")
 async def ask_question(body: QuestionRequest):
-    tool_result = route_tool(body.question)
+    try:
+        tool_result = route_tool(body.question)
+    except Exception as e:
+        logger.warning("Tool routing failed: %s", e)
+        tool_result = None
+
     if tool_result is not None:
         return {
             "source": "tool",

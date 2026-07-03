@@ -13,12 +13,15 @@ def _generate_with_openai(prompt: str) -> str:
     if not api_key:
         raise ValueError("OPENAI_API_KEY is not set")
 
-    client = OpenAI(api_key=api_key)
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return response.choices[0].message.content
+    try:
+        client = OpenAI(api_key=api_key)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        raise ValueError(f"OpenAI API error: {e}")
 
 
 def _generate_with_gemini(prompt: str) -> str:
@@ -28,10 +31,13 @@ def _generate_with_gemini(prompt: str) -> str:
     if not api_key:
         raise ValueError("GEMINI_API_KEY is not set")
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.0-flash")
-    response = model.generate_content(prompt)
-    return response.text
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-2.0-flash")
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        raise ValueError(f"Gemini API error: {e}")
 
 
 def _generate_with_huggingface(prompt: str) -> str:
@@ -41,12 +47,15 @@ def _generate_with_huggingface(prompt: str) -> str:
     if not api_key:
         raise ValueError("HF_API_KEY is not set")
 
-    client = InferenceClient(api_key=api_key)
-    response = client.chat_completion(
-        model="microsoft/Phi-3.5-mini-instruct",
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return response.choices[0].message.content
+    try:
+        client = InferenceClient(api_key=api_key)
+        response = client.chat_completion(
+            model="microsoft/Phi-3.5-mini-instruct",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        raise ValueError(f"Hugging Face API error: {e}")
 
 
 def _generate_with_groq(prompt: str) -> str:

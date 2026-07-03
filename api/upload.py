@@ -1,7 +1,11 @@
+import logging
+
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from services.chunking import split_text
 from services.ingestion import validate_file, read_document
 from services.vector_store import create_vector_store, save_vector_store
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/upload")
 
@@ -18,9 +22,13 @@ async def upload_document(file: UploadFile = File(...)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    chunks = split_text(text)
-    vector_store = create_vector_store(chunks)
-    save_vector_store(vector_store)
+    try:
+        chunks = split_text(text)
+        vector_store = create_vector_store(chunks)
+        save_vector_store(vector_store)
+    except Exception as e:
+        logger.exception("Document processing failed")
+        raise HTTPException(status_code=500, detail=f"Document processing failed: {e}")
 
     return {
         "filename": file.filename,
