@@ -1,9 +1,10 @@
 const chatBox = document.getElementById("chat-box");
-const input = document.getElementById("question-input");
+const questionInput = document.getElementById("question-input");
 const sendBtn = document.getElementById("send-btn");
 const uploadArea = document.getElementById("upload-area");
 const fileInput = document.getElementById("file-input");
 const uploadStatus = document.getElementById("upload-status");
+const sourcesList = document.getElementById("sources-list");
 
 let uploadedFilename = null;
 
@@ -13,8 +14,10 @@ fileInput.addEventListener("change", async () => {
   const file = fileInput.files[0];
   if (!file) return;
 
-  uploadStatus.textContent = "Uploading...";
-  uploadStatus.className = "";
+  uploadArea.classList.add("loading");
+  uploadStatus.textContent = "Uploading document...";
+  uploadStatus.className = "loading";
+  fileInput.disabled = true;
 
   const formData = new FormData();
   formData.append("file", file);
@@ -24,23 +27,27 @@ fileInput.addEventListener("change", async () => {
     const data = await res.json();
 
     if (!res.ok) {
-      uploadStatus.textContent = `Error: ${data.detail || "Upload failed"}`;
+      uploadStatus.textContent = data.detail || "Upload failed";
       uploadStatus.className = "error";
       return;
     }
 
     uploadedFilename = data.filename;
-    uploadStatus.textContent = `Indexed "${data.filename}" (${data.chunks} chunks)`;
+    uploadStatus.textContent = `Indexed "${data.filename}" \u2014 ${data.chunks} chunks`;
     uploadStatus.className = "success";
+    uploadArea.classList.remove("loading");
     uploadArea.classList.add("has-file");
   } catch {
     uploadStatus.textContent = "Network error during upload";
     uploadStatus.className = "error";
+  } finally {
+    uploadArea.classList.remove("loading");
+    fileInput.disabled = false;
   }
 });
 
 sendBtn.addEventListener("click", askQuestion);
-input.addEventListener("keydown", (e) => {
+questionInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     askQuestion();
@@ -48,14 +55,14 @@ input.addEventListener("keydown", (e) => {
 });
 
 async function askQuestion() {
-  const question = input.value.trim();
+  const question = questionInput.value.trim();
   if (!question) return;
 
   addMessage(question, "user");
-  input.value = "";
+  questionInput.value = "";
   sendBtn.disabled = true;
 
-  const loadingId = addMessage("Thinking...", "loading");
+  const loadingEl = addSpinner();
 
   try {
     const res = await fetch("/chat/ask", {
@@ -65,7 +72,7 @@ async function askQuestion() {
     });
     const data = await res.json();
 
-    removeMessage(loadingId);
+    removeMessage(loadingEl);
 
     if (!res.ok) {
       addMessage(data.detail || "Something went wrong", "error");
@@ -73,17 +80,43 @@ async function askQuestion() {
     }
 
     if (data.source === "tool") {
-      addMessage(formatToolResult(data.answer), "bot");
+      addMessage(formatJSON(data.answer), "bot");
     } else {
       addMessage(data.answer, "bot");
+      if (data.retrieved_chunks !== undefined) {
+        updateSources(question, data.retrieved_chunks);
+      }
     }
   } catch {
-    removeMessage(loadingId);
+    removeMessage(loadingEl);
     addMessage("Network error. Please try again.", "error");
   } finally {
     sendBtn.disabled = false;
-    input.focus();
+    questionInput.focus();
   }
+}
+
+function updateSources(question, count) {
+  sourcesList.innerHTML = "";
+
+  const item = document.createElement("p");
+  item.textContent = `Retrieved ${count} chunk${count !== 1 ? "s" : ""} for: "${question}"`;
+  sourcesList.appendChild(item);
+
+  const details = sourcesList.closest("details");
+  if (details) details.open = true;
+}
+
+function addSpinner() {
+  const placeholder = chatBox.querySelector(".placeholder");
+  if (placeholder) placeholder.remove();
+
+  const container = document.createElement("div");
+  container.className = "message loading";
+  container.innerHTML = '<span class="spinner"></span> Thinking...';
+  chatBox.appendChild(container);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return container;
 }
 
 function addMessage(text, className) {
@@ -102,7 +135,7 @@ function removeMessage(el) {
   if (el && el.parentNode) el.remove();
 }
 
-function formatToolResult(data) {
+function formatJSON(data) {
   if (typeof data === "object" && data !== null) {
     return JSON.stringify(data, null, 2);
   }
