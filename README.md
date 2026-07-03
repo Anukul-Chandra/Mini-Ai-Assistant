@@ -33,24 +33,31 @@ Mini AI Assistant lets you:
 
 ## Architecture 🏗️
 
-```
-Client → FastAPI → Router → Service → External
-                          
-POST /upload/document
-  └─ validate_file()       — checks file extension
-  └─ read_document()       — extracts text (PDF/TXT/MD)
-  └─ split_text()          — chunks text
-  └─ create_vector_store() — builds FAISS index
-  └─ save_vector_store()   — persists to disk
+```mermaid
+graph TD
+    User -->|POST /chat/ask| FastAPI
+    FastAPI --> ChatAPI
 
-POST /chat/ask
-  ├─ route_tool()          — checks for ORD-/PRD- IDs
-  │   └─ returns JSON if found (order/product lookup)
-  └─ retrieve_context()    — FAISS similarity search
-  └─ build_prompt()        — RAG prompt with context
-  └─ generate_response()   — LLM call (OpenAI/Gemini/HF/Groq)
-  └─ add_to_memory()       — stores Q&A pair
+    subgraph Tool_Route ["Tool Routing"]
+        ChatAPI --> ToolRouter[route_tool]
+        ToolRouter -->|ORD-* ID| OrdersJSON[(orders.json)]
+        ToolRouter -->|PRD-* ID| ProductsJSON[(products.json)]
+        ToolRouter -->|No match| RAG
+    end
+
+    subgraph RAG ["RAG Pipeline"]
+        RAG --> Retrieve[retrieve_context]
+        Retrieve -->|similarity_search| FAISS[(FAISS Vector Store)]
+        FAISS --> Embeddings[get_embedding_model]
+        Retrieve -->|top-k chunks| PromptBuilder[build_prompt]
+        PromptBuilder --> LLM[generate_response]
+        LLM -->|OpenAI / Gemini / HF / Groq| Response
+    end
+
+    Response --> User
 ```
+
+**Document ingestion flow:** `POST /upload/document` → validate → read → split_text → create_vector_store → save to disk.
 
 ---
 
