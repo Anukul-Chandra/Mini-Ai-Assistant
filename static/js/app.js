@@ -79,13 +79,9 @@ async function askQuestion() {
       return;
     }
 
-    if (data.source === "tool") {
-      addMessage(formatJSON(data.answer), "bot");
-    } else {
-      addMessage(data.answer, "bot");
-      if (data.retrieved_chunks !== undefined) {
-        updateSources(question, data.retrieved_chunks);
-      }
+    addMessage(data.answer || JSON.stringify(data), "bot");
+    if (data.type === "knowledge" && data.retrieved_chunks) {
+      updateSources(question, data.retrieved_chunks);
     }
   } catch {
     removeMessage(loadingEl);
@@ -96,12 +92,20 @@ async function askQuestion() {
   }
 }
 
-function updateSources(question, count) {
+function updateSources(question, chunks) {
   sourcesList.innerHTML = "";
 
-  const item = document.createElement("p");
-  item.textContent = `Retrieved ${count} chunk${count !== 1 ? "s" : ""} for: "${question}"`;
-  sourcesList.appendChild(item);
+  const count = chunks.length;
+  const header = document.createElement("p");
+  header.textContent = `Retrieved ${count} chunk${count !== 1 ? "s" : ""} for: "${question}"`;
+  sourcesList.appendChild(header);
+
+  chunks.forEach((chunk, i) => {
+    const item = document.createElement("p");
+    item.className = "chunk";
+    item.textContent = chunk;
+    sourcesList.appendChild(item);
+  });
 
   const details = sourcesList.closest("details");
   if (details) details.open = true;
@@ -135,9 +139,4 @@ function removeMessage(el) {
   if (el && el.parentNode) el.remove();
 }
 
-function formatJSON(data) {
-  if (typeof data === "object" && data !== null) {
-    return JSON.stringify(data, null, 2);
-  }
-  return String(data);
-}
+

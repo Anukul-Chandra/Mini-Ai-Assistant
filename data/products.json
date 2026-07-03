@@ -2,36 +2,36 @@
   {
     "product_id": "PRD001",
     "name": "Wireless Mouse",
-    "price": 29.99,
+    "price": 25,
     "category": "Electronics",
-    "in_stock": true
+    "stock": 12
   },
   {
     "product_id": "PRD002",
     "name": "Mechanical Keyboard",
-    "price": 89.99,
+    "price": 89,
     "category": "Electronics",
-    "in_stock": true
+    "stock": 5
   },
   {
     "product_id": "PRD003",
     "name": "USB-C Hub",
-    "price": 24.99,
+    "price": 24,
     "category": "Accessories",
-    "in_stock": false
+    "stock": 0
   },
   {
     "product_id": "PRD004",
     "name": "Laptop Stand",
-    "price": 39.99,
+    "price": 39,
     "category": "Accessories",
-    "in_stock": true
+    "stock": 8
   },
   {
     "product_id": "PRD005",
     "name": "Webcam",
-    "price": 59.99,
+    "price": 59,
     "category": "Electronics",
-    "in_stock": true
+    "stock": 3
   }
 ]

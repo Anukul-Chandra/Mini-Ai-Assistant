@@ -43,18 +43,31 @@ async def ask_question(body: QuestionRequest):
 
     if intent == "order":
         logger.info("Detected intent: ORDER")
-        add_to_memory(body.question, str(tool_result))
+        status = tool_result.get("status", "unknown").capitalize()
+        delivery = tool_result.get("estimated_delivery", "N/A")
+        answer = f"Order {tool_result['order_id']} is {status}. Estimated delivery: {delivery}."
+        add_to_memory(body.question, answer)
         return {
-            "source": "order_tool",
-            "answer": tool_result,
+            "type": "order",
+            "answer": answer,
+            "data": tool_result,
         }
 
     if intent == "product":
         logger.info("Detected intent: PRODUCT")
-        add_to_memory(body.question, str(tool_result))
+        if isinstance(tool_result, list) and len(tool_result) > 0:
+            product = tool_result[0]
+            name = product.get("name", "Unknown")
+            price = product.get("price", 0)
+            stock = product.get("stock", 0)
+            answer = f"{name} costs ${price} and {stock} units are in stock."
+        else:
+            answer = "No product found."
+        add_to_memory(body.question, answer)
         return {
-            "source": "product_tool",
-            "answer": tool_result,
+            "type": "product",
+            "answer": answer,
+            "data": tool_result if isinstance(tool_result, list) else [tool_result],
         }
 
     if history:
@@ -78,7 +91,7 @@ async def ask_question(body: QuestionRequest):
     add_to_memory(body.question, answer)
 
     return {
-        "question": body.question,
+        "type": "knowledge",
         "answer": answer,
-        "retrieved_chunks": len(chunks),
+        "retrieved_chunks": chunks,
     }
