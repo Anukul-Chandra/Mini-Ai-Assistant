@@ -87,6 +87,9 @@ async function askQuestion() {
 }
 
 function addMessage(text, className) {
+  const placeholder = chatBox.querySelector(".placeholder");
+  if (placeholder) placeholder.remove();
+
   const div = document.createElement("div");
   div.className = `message ${className}`;
   div.textContent = text;

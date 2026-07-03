@@ -7,35 +7,49 @@
   <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}" />
 </head>
 <body>
-  <header>
-    <h1>Mini AI Assistant</h1>
-    <span>RAG-powered document Q&A</span>
-  </header>
+  <nav>
+    <div class="nav-brand">
+      <h1>Mini AI Assistant</h1>
+      <small>Powered by FastAPI + RAG + Groq</small>
+    </div>
+  </nav>
 
   <main>
-    <div id="upload-area">
-      <input type="file" id="file-input" accept=".pdf,.txt,.md" />
-      <label for="file-input">
-        <strong>Upload a document</strong>
-        <p>PDF, TXT, or Markdown</p>
-      </label>
-      <div id="upload-status"></div>
-    </div>
+    <section class="content-grid">
+      <div class="card" id="upload-card">
+        <h2>Document Upload</h2>
+        <div id="upload-area">
+          <input type="file" id="file-input" accept=".pdf,.txt,.md" />
+          <label for="file-input">Upload PDF</label>
+          <p id="upload-status">No document uploaded</p>
+        </div>
+      </div>
 
-    <div id="chat-box">
-      <div class="placeholder">Upload a document and ask a question to get started.</div>
-    </div>
+      <div class="card" id="ask-card">
+        <h2>Ask AI</h2>
+        <textarea id="question-input" rows="4" placeholder="Type your question here..."></textarea>
+        <button id="send-btn">Ask</button>
+      </div>
+    </section>
 
-    <div id="input-area">
-      <input
-        type="text"
-        id="question-input"
-        placeholder="Ask a question about your document..."
-        autofocus
-      />
-      <button id="send-btn">Send</button>
-    </div>
+    <section class="card" id="response-card">
+      <h2>AI Response</h2>
+      <div id="chat-box">
+        <p class="placeholder">Upload a document and ask a question to get started.</p>
+      </div>
+    </section>
+
+    <section class="card" id="sources-card">
+      <details>
+        <summary>Retrieved Sources</summary>
+        <div id="sources-list"></div>
+      </details>
+    </section>
   </main>
+
+  <footer>
+    <p>Made with FastAPI</p>
+  </footer>
 
   <script src="{{ url_for('static', path='js/app.js') }}"></script>
 </body>
