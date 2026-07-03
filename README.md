@@ -80,6 +80,20 @@ graph TD
 
 ---
 
+## Prompt Design 📝
+
+The system prompt instructs the assistant to answer only using the provided information. Conversation history is included when available so follow-up questions maintain context. Tool results (order status, product details) are injected directly into the response without querying the vector store.
+
+- **Knowledge questions** — Retrieved document chunks are placed in the prompt as context. The assistant must answer from those chunks alone.
+- **Memory questions** — Previous conversation turns are prepended so the assistant can reference past exchanges.
+- **Tool queries** — The tool result is formatted into a natural-language answer and returned immediately without LLM generation.
+
+If the answer cannot be found in the uploaded documents, the assistant replies:
+
+> *"I couldn't find that information in the uploaded documents."*
+
+---
+
 ## Project Structure 📁
 
 ```
