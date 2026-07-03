@@ -35,26 +35,24 @@ Mini AI Assistant lets you:
 
 ```mermaid
 graph TD
-    User -->|POST /chat/ask| FastAPI
-    FastAPI --> ChatAPI
+    User -->|Question| Frontend
+    Frontend -->|POST /chat/ask| FastAPI
+    FastAPI --> Memory[Conversation Memory]
 
-    subgraph Tool_Route ["Tool Routing"]
-        ChatAPI --> ToolRouter[route_tool]
-        ToolRouter -->|ORD-* ID| OrdersJSON[(orders.json)]
-        ToolRouter -->|PRD-* ID| ProductsJSON[(products.json)]
-        ToolRouter -->|No match| RAG
-    end
+    Memory --> Intent[Intent Detection]
+    Intent -->|Knowledge| FAISS[(FAISS Vector Store)]
+    Intent -->|Order| Orders[(orders.json)]
+    Intent -->|Product| Products[(products.json)]
+    Intent -->|Direct| LLM[Groq LLM]
 
-    subgraph RAG ["RAG Pipeline"]
-        RAG --> Retrieve[retrieve_context]
-        Retrieve -->|similarity_search| FAISS[(FAISS Vector Store)]
-        FAISS --> Embeddings[get_embedding_model]
-        Retrieve -->|top-k chunks| PromptBuilder[build_prompt]
-        PromptBuilder --> LLM[generate_response]
-        LLM -->|OpenAI / Gemini / HF / Groq| Response
-    end
+    FAISS --> Context[Retrieved Context + Memory + Tool Output]
+    Orders --> Context
+    Products --> Context
+    Context --> Prompt[Prompt Builder]
 
-    Response --> User
+    Prompt --> LLM
+    LLM --> Response
+    Response --> Frontend
 ```
 
 **Document ingestion flow:** `POST /upload/document` → validate → read → split_text → create_vector_store → save to disk.
