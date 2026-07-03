@@ -49,10 +49,39 @@ def _generate_with_huggingface(prompt: str) -> str:
     return response.choices[0].message.content
 
 
+def _generate_with_groq(prompt: str) -> str:
+    from groq import Groq
+
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY is not set")
+
+    try:
+        client = Groq(api_key=api_key)
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a helpful AI assistant. Answer only using the "
+                        "provided context. If the answer is not available in the "
+                        "context, clearly say so."
+                    ),
+                },
+                {"role": "user", "content": prompt},
+            ],
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        raise ValueError(f"Groq API error: {e}")
+
+
 _PROVIDERS = {
     "openai": _generate_with_openai,
     "gemini": _generate_with_gemini,
     "huggingface": _generate_with_huggingface,
+    "groq": _generate_with_groq,
 }
 
 
@@ -71,13 +100,13 @@ def generate_response(prompt: str) -> str:
     provider = os.getenv("LLM_PROVIDER", "").strip().lower()
     if not provider:
         raise ValueError(
-            "LLM_PROVIDER is not set. Choose 'openai', 'gemini', or 'huggingface'."
+            "LLM_PROVIDER is not set. Choose 'openai', 'gemini', 'huggingface', or 'groq'."
         )
 
     generator = _PROVIDERS.get(provider)
     if generator is None:
         raise ValueError(
-            f"Unknown LLM provider '{provider}'. Choose 'openai', 'gemini', or 'huggingface'."
+            f"Unknown LLM provider '{provider}'. Choose 'openai', 'gemini', 'huggingface', or 'groq'."
         )
 
     return generator(prompt)

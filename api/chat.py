@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from services.llm import generate_response
+from services.prompt_builder import build_prompt
 from services.retrieval import retrieve_context
 
 router = APIRouter(prefix="/chat")
@@ -17,8 +19,15 @@ async def ask_question(body: QuestionRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+    prompt = build_prompt(body.question, chunks)
+
+    try:
+        answer = generate_response(prompt)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     return {
         "question": body.question,
-        "retrieved_chunks": chunks,
-        "count": len(chunks),
+        "answer": answer,
+        "retrieved_chunks": len(chunks),
     }
