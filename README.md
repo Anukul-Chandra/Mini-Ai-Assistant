@@ -94,6 +94,18 @@ If the answer cannot be found in the uploaded documents, the assistant replies:
 
 ---
 
+## Screenshots 📸
+
+| Interface | Preview |
+|---|---|
+| **Home Interface** | `![Home Interface](screenshots/home.png)` |
+| **Upload Document** | `![Upload Document](screenshots/upload.png)` |
+| **Chat Example** | `![Chat Example](screenshots/chat.png)` |
+| **Order Tool** | `![Order Tool](screenshots/order-tool.png)` |
+| **Product Tool** | `![Product Tool](screenshots/product-tool.png)` |
+
+---
+
 ## Project Structure 📁
 
 ```
