@@ -1,5 +1,9 @@
+import logging
+
 from langchain_community.vectorstores import FAISS
 from services.embeddings import get_embedding_model
+
+logger = logging.getLogger(__name__)
 
 
 def create_vector_store(chunks: list[str]) -> FAISS:
@@ -38,4 +42,5 @@ def load_vector_store(path: str = "data/vector_store") -> FAISS | None:
         embeddings = get_embedding_model()
         return FAISS.load_local(path, embeddings, allow_dangerous_deserialization=True)
     except Exception:
+        logger.exception("Failed to load vector store from %s", path)
         return None
