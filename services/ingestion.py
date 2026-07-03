@@ -7,13 +7,17 @@ from pypdf import PdfReader, PdfReadError
 ALLOWED_EXTENSIONS = {".pdf", ".txt", ".md"}
 
 
+def _get_extension(filename: str) -> str:
+    if "." in filename:
+        return f".{filename.rsplit('.', 1)[-1].lower()}"
+    return ""
+
+
 def validate_file(file: UploadFile) -> bool:
     if not file.filename:
         raise ValueError("No filename provided")
 
-    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
-    ext = f".{ext}"
-
+    ext = _get_extension(file.filename)
     if ext not in ALLOWED_EXTENSIONS:
         raise ValueError(
             f"File extension '{ext}' is not allowed. Allowed extensions: {', '.join(sorted(ALLOWED_EXTENSIONS))}"
@@ -26,8 +30,7 @@ def read_document(file: UploadFile) -> str:
     if not file.filename:
         raise ValueError("No filename provided")
 
-    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
-    ext = f".{ext}"
+    ext = _get_extension(file.filename)
 
     try:
         if ext == ".pdf":
