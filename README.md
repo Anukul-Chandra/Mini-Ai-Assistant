@@ -96,13 +96,14 @@ If the answer cannot be found in the uploaded documents, the assistant replies:
 
 ## Screenshots 📸
 
-| Interface | Preview |
-|---|---|
-| **Home Interface** | `![Home Interface](screenshots/home.png)` |
-| **Upload Document** | `![Upload Document](screenshots/upload.png)` |
-| **Chat Example** | `![Chat Example](screenshots/chat.png)` |
-| **Order Tool** | `![Order Tool](screenshots/order-tool.png)` |
-| **Product Tool** | `![Product Tool](screenshots/product-tool.png)` |
+| Feature | Preview |
+|----------|---------|
+| **🏠 Home Interface** | <img width="1185" alt="Home Interface" src="https://github.com/user-attachments/assets/79f865df-bb4e-4360-a520-f7d8c824d1d9" /> |
+| **📄 Document Upload** | <img width="431" alt="Document Upload" src="https://github.com/user-attachments/assets/33896623-6b66-4a77-8e3e-3614ff549636" /> |
+| **💬 Knowledge Base Chat (RAG)** | <img width="851" alt="Knowledge Chat" src="https://github.com/user-attachments/assets/3656718e-d76e-49f4-925c-8676c2233261" /> |
+| **🧠 Conversation Memory** | <img width="828" alt="Conversation Memory" src="https://github.com/user-attachments/assets/e943baf6-78a9-4464-a56c-32f88c34323b" /> |
+| **📦 Order Status Tool** | <img width="827" alt="Order Status Tool" src="https://github.com/user-attachments/assets/08856b3f-7cb6-428d-a9b0-9c869911d849" /> |
+| **🛒 Product Search Tool** | <img width="804" alt="Product Search Tool" src="https://github.com/user-attachments/assets/760e7f9b-66ff-492a-831d-24ecf663f6f7" /> |
 
 ---
 
