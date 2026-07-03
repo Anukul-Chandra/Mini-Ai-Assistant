@@ -203,13 +203,19 @@ main {
 #upload-area.loading {
   opacity: 0.6;
   pointer-events: none;
+  cursor: default;
+}
+
+#upload-area.loading #upload-label {
+  cursor: default;
+  pointer-events: none;
 }
 
 #upload-area input {
   display: none;
 }
 
-#upload-area label {
+#upload-label {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -219,18 +225,18 @@ main {
   border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
   transition: all var(--transition);
   box-shadow: 0 4px 12px var(--primary-glow);
+  pointer-events: none;
 }
 
-#upload-area label:hover {
+#upload-area:hover #upload-label {
   background: var(--primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px var(--primary-glow);
 }
 
-#upload-area label:active {
+#upload-area:active #upload-label {
   transform: translateY(0);
 }
 
