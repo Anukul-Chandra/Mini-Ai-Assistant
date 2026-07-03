@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini AI Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}" />
+</head>
+<body>
+  <header>
+    <h1>Mini AI Assistant</h1>
+    <span>RAG-powered document Q&A</span>
+  </header>
+
+  <main>
+    <div id="upload-area">
+      <input type="file" id="file-input" accept=".pdf,.txt,.md" />
+      <label for="file-input">
+        <strong>Upload a document</strong>
+        <p>PDF, TXT, or Markdown</p>
+      </label>
+      <div id="upload-status"></div>
+    </div>
+
+    <div id="chat-box">
+      <div class="placeholder">Upload a document and ask a question to get started.</div>
+    </div>
+
+    <div id="input-area">
+      <input
+        type="text"
+        id="question-input"
+        placeholder="Ask a question about your document..."
+        autofocus
+      />
+      <button id="send-btn">Send</button>
+    </div>
+  </main>
+
+  <script src="{{ url_for('static', path='js/app.js') }}"></script>
+</body>
+</html>
