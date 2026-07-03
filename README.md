@@ -59,6 +59,27 @@ graph TD
 
 ---
 
+## AI Pipeline 🧠
+
+1. **User uploads a document** — Upload a PDF, TXT, or Markdown file via the frontend.
+2. **Document validation** — The file extension and content are validated against allowed types.
+3. **Text extraction** — Text is extracted from PDFs using PyPDF or read directly from plain-text files.
+4. **Chunking** — Extracted text is split into overlapping chunks using `RecursiveCharacterTextSplitter`.
+5. **Embedding generation** — Each chunk is converted into a vector embedding using `sentence-transformers/all-MiniLM-L6-v2`.
+6. **FAISS indexing** — Embeddings are indexed in a FAISS vector store and persisted to disk.
+7. **User asks a question** — The question is submitted through the chat interface.
+8. **Load conversation memory** — Previous question-answer pairs are loaded from in-memory history.
+9. **Intent detection** — The system classifies the question as Knowledge, Order, Product, or Direct LLM.
+10. **Route to:**
+    - **Knowledge Retrieval** — Perform similarity search over the FAISS index for relevant chunks.
+    - **Order Tool** — Look up order status from `orders.json`.
+    - **Product Tool** — Search product details in `products.json`.
+11. **Build prompt** — Retrieved context, tool output, and conversation history are assembled into a structured prompt.
+12. **Generate answer using Groq** — The prompt is sent to the Groq LLM (`llama-3.3-70b-versatile`) for response generation.
+13. **Return response** — The answer is sent back to the frontend and displayed to the user.
+
+---
+
 ## Project Structure 📁
 
 ```
