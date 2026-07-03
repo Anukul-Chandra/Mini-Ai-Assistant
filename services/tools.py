@@ -32,6 +32,29 @@ def _load_json(file_path: str) -> list[dict]:
     return data
 
 
+def _lookup_by_id(file_path: str, id_field: str, target_id: str) -> dict | None:
+    """Load a JSON array and find an item matching the given ID field.
+
+    Args:
+        file_path: Path to the JSON file.
+        id_field: The dictionary key to match against.
+        target_id: The value to search for.
+
+    Returns:
+        The matching dictionary, or None if not found.
+    """
+    try:
+        items = _load_json(file_path)
+    except (FileNotFoundError, json.JSONDecodeError, ValueError):
+        return None
+
+    for item in items:
+        if isinstance(item, dict) and item.get(id_field) == target_id:
+            return item
+
+    return None
+
+
 def get_order(order_id: str) -> dict | None:
     """Search for an order by its ID.
 
@@ -41,16 +64,7 @@ def get_order(order_id: str) -> dict | None:
     Returns:
         The matching order dictionary, or None if not found.
     """
-    try:
-        orders = _load_json(_ORDERS_PATH)
-    except (FileNotFoundError, json.JSONDecodeError, ValueError):
-        return None
-
-    for order in orders:
-        if isinstance(order, dict) and order.get("order_id") == order_id:
-            return order
-
-    return None
+    return _lookup_by_id(_ORDERS_PATH, "order_id", order_id)
 
 
 def get_product(product_id: str) -> dict | None:
@@ -62,16 +76,7 @@ def get_product(product_id: str) -> dict | None:
     Returns:
         The matching product dictionary, or None if not found.
     """
-    try:
-        products = _load_json(_PRODUCTS_PATH)
-    except (FileNotFoundError, json.JSONDecodeError, ValueError):
-        return None
-
-    for product in products:
-        if isinstance(product, dict) and product.get("product_id") == product_id:
-            return product
-
-    return None
+    return _lookup_by_id(_PRODUCTS_PATH, "product_id", product_id)
 
 
 def route_tool(question: str) -> dict | None:

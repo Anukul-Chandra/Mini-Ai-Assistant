@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from langchain_huggingface import HuggingFaceEmbeddings
 
 
-_model = None
+_model: HuggingFaceEmbeddings | None = None
 
 
 def get_embedding_model() -> HuggingFaceEmbeddings:
@@ -12,11 +12,8 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
 
     if _model is None:
         load_dotenv()
-        model_kwargs = {}
-
         hf_token = os.getenv("HF_TOKEN")
-        if hf_token:
-            model_kwargs["token"] = hf_token
+        model_kwargs = {"token": hf_token} if hf_token else {}
 
         _model = HuggingFaceEmbeddings(
             model_name="sentence-transformers/all-MiniLM-L6-v2",
