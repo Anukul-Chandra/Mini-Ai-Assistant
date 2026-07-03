@@ -1,3 +1,12 @@
+---
+title: Mini AI Assistant
+emoji: 🤖
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+pinned: false
+---
+
 # Mini AI Assistant 🤖
 
 A lightweight **RAG (Retrieval-Augmented Generation)** API built with FastAPI. Upload documents, ask questions, and get answers powered by your preferred LLM — all through a clean REST API.
