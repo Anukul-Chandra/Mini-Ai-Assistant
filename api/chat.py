@@ -33,6 +33,8 @@ def _build_history() -> str:
 
 @router.post("/ask")
 async def ask_question(body: QuestionRequest):
+    history = _build_history()
+
     try:
         tool_result = route_tool(body.question)
     except Exception as e:
@@ -40,20 +42,19 @@ async def ask_question(body: QuestionRequest):
         tool_result = None
 
     if tool_result is not None:
+        add_to_memory(body.question, str(tool_result))
         return {
             "source": "tool",
             "answer": tool_result,
         }
 
+    chunks = []
     try:
         chunks = retrieve_context(body.question)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.info("No vector store available, proceeding without RAG context: %s", e)
 
-    prompt = build_prompt(body.question, chunks)
-    history = _build_history()
-    if history:
-        prompt = f"{history}\n\n{prompt}"
+    prompt = build_prompt(body.question, chunks, history)
 
     try:
         answer = generate_response(prompt)

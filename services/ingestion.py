@@ -1,7 +1,8 @@
 from io import BytesIO
 
 from fastapi import UploadFile
-from pypdf import PdfReader, PdfReadError
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError
 
 
 ALLOWED_EXTENSIONS = {".pdf", ".txt", ".md"}
