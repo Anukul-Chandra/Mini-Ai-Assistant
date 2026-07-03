@@ -1,35 +1,14 @@
-# Environment
+.git
+.gitignore
+.venv
+__pycache__
+.pytest_cache
 .env
-.venv/
-venv/
-
-# Python cache
-__pycache__/
+.env.*
 *.pyc
 *.pyo
-*.egg-info/
-
-# Version control
-.git/
-.gitignore
-.gitattributes
-
-# Editor / IDE
-.history/
-.lh/
-.vscode/
-.idea/
-
-# OS metadata
+*.pyd
 .DS_Store
-Thumbs.db
-
-# Docker
-Dockerfile
-.dockerignore
-
-# Test files
-test_*.py
-
-# Documentation
-README.md
+.vscode
+.idea
+node_modules
