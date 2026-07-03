@@ -1,0 +1,23 @@
+[
+  {
+    "order_id": "ORD001",
+    "status": "shipped",
+    "items": ["Wireless Mouse", "USB-C Hub"],
+    "total": 49.99,
+    "estimated_delivery": "2026-07-10"
+  },
+  {
+    "order_id": "ORD002",
+    "status": "processing",
+    "items": ["Mechanical Keyboard"],
+    "total": 89.99,
+    "estimated_delivery": "2026-07-15"
+  },
+  {
+    "order_id": "ORD003",
+    "status": "delivered",
+    "items": ["Laptop Stand", "Webcam"],
+    "total": 65.50,
+    "estimated_delivery": "2026-07-02"
+  }
+]

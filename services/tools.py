@@ -2,24 +2,15 @@ import json
 import os
 import re
 
+
 _ORDERS_PATH = os.path.join("data", "orders.json")
 _PRODUCTS_PATH = os.path.join("data", "products.json")
 
+_ORDER_KEYWORDS = ["order", "shipping", "delivery", "track", "where is"]
+_PRODUCT_KEYWORDS = ["product", "have", "got", "looking for", "price of", "do you"]
+
 
 def _load_json(file_path: str) -> list[dict]:
-    """Load and validate a JSON file containing an array of objects.
-
-    Args:
-        file_path: Path to the JSON file.
-
-    Returns:
-        A list of dictionaries parsed from the file.
-
-    Raises:
-        FileNotFoundError: If the file does not exist.
-        json.JSONDecodeError: If the file contains invalid JSON.
-        ValueError: If the root value is not a JSON array.
-    """
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found at {file_path}")
 
@@ -27,22 +18,16 @@ def _load_json(file_path: str) -> list[dict]:
         data = json.load(f)
 
     if not isinstance(data, list):
-        raise ValueError(f"File must contain a JSON array")
+        raise ValueError("File must contain a JSON array")
 
     return data
 
 
+def _normalize_id(raw: str) -> str:
+    return re.sub(r"[-_\s]", "", raw)
+
+
 def _lookup_by_id(file_path: str, id_field: str, target_id: str) -> dict | None:
-    """Load a JSON array and find an item matching the given ID field.
-
-    Args:
-        file_path: Path to the JSON file.
-        id_field: The dictionary key to match against.
-        target_id: The value to search for.
-
-    Returns:
-        The matching dictionary, or None if not found.
-    """
     try:
         items = _load_json(file_path)
     except (FileNotFoundError, json.JSONDecodeError, ValueError):
@@ -56,44 +41,65 @@ def _lookup_by_id(file_path: str, id_field: str, target_id: str) -> dict | None:
 
 
 def get_order(order_id: str) -> dict | None:
-    """Search for an order by its ID.
-
-    Args:
-        order_id: The unique identifier of the order.
-
-    Returns:
-        The matching order dictionary, or None if not found.
-    """
     return _lookup_by_id(_ORDERS_PATH, "order_id", order_id)
 
 
 def get_product(product_id: str) -> dict | None:
-    """Search for a product by its ID.
-
-    Args:
-        product_id: The unique identifier of the product.
-
-    Returns:
-        The matching product dictionary, or None if not found.
-    """
     return _lookup_by_id(_PRODUCTS_PATH, "product_id", product_id)
 
 
-def route_tool(question: str) -> dict | None:
-    """Detect entity IDs in a question and route to the appropriate lookup tool.
+def search_product_by_name(query: str) -> list[dict]:
+    try:
+        products = _load_json(_PRODUCTS_PATH)
+    except (FileNotFoundError, json.JSONDecodeError, ValueError):
+        return []
 
-    Args:
-        question: The user's question string.
+    query_lower = query.lower()
+    results = []
+    for product in products:
+        name = product.get("name", "")
+        if name.lower() in query_lower:
+            results.append(product)
+    return results
 
-    Returns:
-        The matched order or product dictionary, or None if no ID is found.
-    """
-    order_match = re.search(r"ORD-\d+", question)
-    if order_match:
-        return get_order(order_match.group())
 
-    product_match = re.search(r"PRD-\d+", question)
-    if product_match:
-        return get_product(product_match.group())
+def detect_intent(question: str) -> tuple[str | None, dict | list[dict] | None]:
+    order_id_match = re.search(r"(?:ORD)[-_\s]?\d+", question, re.IGNORECASE)
+    if order_id_match:
+        raw = order_id_match.group()
+        normalized = _normalize_id(raw)
+        result = get_order(normalized)
+        if result:
+            return ("order", result)
 
-    return None
+    has_order_keyword = any(kw in question.lower() for kw in _ORDER_KEYWORDS)
+    order_id_any = re.search(r"[A-Z]*\d{3,}", question)
+    if has_order_keyword and order_id_any:
+        result = get_order(order_id_any.group())
+        if result:
+            return ("order", result)
+
+    product_id_match = re.search(r"(?:PRD)[-_\s]?\d+", question, re.IGNORECASE)
+    if product_id_match:
+        raw = product_id_match.group()
+        normalized = _normalize_id(raw)
+        result = get_product(normalized)
+        if result:
+            return ("product", result)
+
+    has_product_keyword = any(kw in question.lower() for kw in _PRODUCT_KEYWORDS)
+    if has_product_keyword:
+        results = search_product_by_name(question)
+        if results:
+            return ("product", results)
+
+    results = search_product_by_name(question)
+    if results:
+        return ("product", results)
+
+    return (None, None)
+
+
+def route_tool(question: str) -> dict | list[dict] | None:
+    _, result = detect_intent(question)
+    return result

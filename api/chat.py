@@ -7,7 +7,7 @@ from services.llm import generate_response
 from services.memory import add_to_memory, get_history
 from services.prompt_builder import build_prompt
 from services.retrieval import retrieve_context
-from services.tools import route_tool
+from services.tools import detect_intent
 
 logger = logging.getLogger(__name__)
 
@@ -35,22 +35,36 @@ def _build_history() -> str:
 async def ask_question(body: QuestionRequest):
     history = _build_history()
 
+    intent, tool_result = None, None
     try:
-        tool_result = route_tool(body.question)
+        intent, tool_result = detect_intent(body.question)
     except Exception as e:
-        logger.warning("Tool routing failed: %s", e)
-        tool_result = None
+        logger.warning("Intent detection failed: %s", e)
 
-    if tool_result is not None:
+    if intent == "order":
+        logger.info("Detected intent: ORDER")
         add_to_memory(body.question, str(tool_result))
         return {
-            "source": "tool",
+            "source": "order_tool",
             "answer": tool_result,
         }
+
+    if intent == "product":
+        logger.info("Detected intent: PRODUCT")
+        add_to_memory(body.question, str(tool_result))
+        return {
+            "source": "product_tool",
+            "answer": tool_result,
+        }
+
+    if history:
+        logger.info("Detected intent: MEMORY")
 
     chunks = []
     try:
         chunks = retrieve_context(body.question)
+        if chunks:
+            logger.info("Detected intent: KNOWLEDGE")
     except ValueError as e:
         logger.info("No vector store available, proceeding without RAG context: %s", e)
 
