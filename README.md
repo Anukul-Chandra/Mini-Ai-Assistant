@@ -11,11 +11,11 @@ pinned: false
 
 A lightweight **RAG (Retrieval-Augmented Generation)** API built with FastAPI. Upload documents, ask questions, and get answers powered by your preferred LLM — all through a clean REST API.
 
----
+## 🚀 Live Demo
 
+Experience the Mini AI Assistant in action by visiting the live demo hosted on Hugging Face.
 
----
-# Live : https://huggingface.co/spaces/AnukulChandra/Mini-AI_Assistant
+🔗 **https://huggingface.co/spaces/AnukulChandra/Mini-AI_Assistant**
 
 ---
 
