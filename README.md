@@ -13,6 +13,12 @@ A lightweight **RAG (Retrieval-Augmented Generation)** API built with FastAPI. U
 
 ---
 
+
+---
+# Live : https://huggingface.co/spaces/AnukulChandra/Mini-AI_Assistant
+
+---
+
 ## Overview 📋
 
 Mini AI Assistant lets you:
