@@ -9,6 +9,9 @@ pinned: false
 
 # Mini AI Assistant 🤖
 
+
+![Mini AI Assistant](https://github.com/user-attachments/assets/2956b95c-02e4-49f0-8cf2-353fd25caf29)
+
 A lightweight **RAG (Retrieval-Augmented Generation)** API built with FastAPI. Upload documents, ask questions, and get answers powered by your preferred LLM — all through a clean REST API.
 
 ## 🚀 Live Demo
